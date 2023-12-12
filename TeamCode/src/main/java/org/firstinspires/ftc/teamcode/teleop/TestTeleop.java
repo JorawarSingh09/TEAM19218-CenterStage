@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.CenterStageRobot;
 
-@TeleOp(name = "Tele: Testing only", group = "Linear OpMode")
+@TeleOp(name = "Tele: CompOp", group = "Linear OpMode")
 public class TestTeleop extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     FtcDashboard dashboard;
