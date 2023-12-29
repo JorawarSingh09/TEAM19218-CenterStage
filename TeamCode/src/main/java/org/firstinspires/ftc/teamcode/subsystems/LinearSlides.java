@@ -99,6 +99,8 @@ public class LinearSlides {
     }
 
     public void climb(double power){
+        leftLinearSlide.setPower(power);
+        rightLinearSlide.setPower(power);
         leftLinearSlide.setTargetPosition(300);
         rightLinearSlide.setTargetPosition(300);
 
@@ -107,14 +109,6 @@ public class LinearSlides {
 
         leftLinearSlide.setPower(power);
         rightLinearSlide.setPower(power);
-
-        while (leftLinearSlide.isBusy() && rightLinearSlide.isBusy()) {
-            // do some stuff here i guess
-        }
-
-        // Stop the motors after reaching the position
-        leftLinearSlide.setPower(0.1);
-        rightLinearSlide.setPower(0.1);
     }
 
     public void reset(){

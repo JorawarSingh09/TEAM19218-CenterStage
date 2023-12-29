@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.GrabberArm;
 import org.firstinspires.ftc.teamcode.subsystems.GrabberState;
 import org.firstinspires.ftc.teamcode.subsystems.LinearSlides;
 import org.firstinspires.ftc.teamcode.subsystems.MechanismState;
+import org.firstinspires.ftc.teamcode.teleop.RobotState;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 public class CenterStageRobot {
@@ -24,7 +26,8 @@ public class CenterStageRobot {
     private LinearSlides linearSlides;
     private GrabberArm grabberArm;
     private Servo planeLauncher;
-    private MechanismState mechanismState = MechanismState.INIT;
+//    private MechanismState mechanismState = MechanismState.INIT;
+    private RobotState robotState = RobotState.initState;
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
 
@@ -126,12 +129,10 @@ public class CenterStageRobot {
         }
 
         // check state of mechanism and set speed limit
-        switch (mechanismState) {
-            case PICKUP:
+        switch (robotState) {
+            case PickupPosition:
                 currentSpeedLimit = LOW_SPEED;
-            case TOP_POSITION:
-                currentSpeedLimit = LOW_SPEED;
-            case DROP_POSITION:
+            case DropPosition:
                 currentSpeedLimit = LOW_SPEED;
             default:
                 currentSpeedLimit = HIGH_SPEED;
@@ -199,9 +200,9 @@ public class CenterStageRobot {
      * position of robot before game has begun
      */
     public void startPosition(){
-        driveStop();
+        robotState = RobotState.initState;
+
         grabberArm.closeClaw();
-        mechanismState = MechanismState.INIT;
         //set Arm position to bottom
         grabberArm.setArmPosition(280);
         // set Wrist to fold up
@@ -213,12 +214,16 @@ public class CenterStageRobot {
      */
     public void drivePosition(){
         driveStop();
-        if(mechanismState == MechanismState.PICKUP && grabberArm.getGrabberState() == GrabberState.CLOSED){
-            mechanismState = MechanismState.DRIVE;
+        if(robotState == RobotState.PickupPosition
+                && grabberArm.getGrabberState() == GrabberState.CLOSED){
+            robotState = RobotState.DrivePosition;
             grabberArm.setWristPosition(1);
         }
     }
 
+    /**
+     * used in autonomous to push team prop out of the way
+     */
     public void pushPosition(){
         grabberArm.closeClaw();
         grabberArm.setArmPosition(200);
@@ -232,9 +237,8 @@ public class CenterStageRobot {
      * mechanism position when you need to pickup the pixel
      */
     public void pickupPosition(){
-        driveStop();
-        if(mechanismState == MechanismState.PICKUP) return;
-        mechanismState = MechanismState.PICKUP;
+        if(robotState == RobotState.PickupPosition) return;
+        setRobotState(RobotState.PickupPosition);
 
         grabberArm.setArmPosition(200);
         grabberArm.manualPower();
@@ -245,49 +249,37 @@ public class CenterStageRobot {
     }
 
     /**
-     * Mechanism position between drop and pickup
-     */
-    public void topPosition(){
-        driveStop();
-        if(mechanismState == MechanismState.TOP_POSITION) return;
-        mechanismState = MechanismState.TOP_POSITION;
-
-        grabberArm.setWristPosition(0);
-        grabberArm.closeClaw();
-        grabberArm.setArmPosition(520);
-        linearSlides.topPosition();
-    }
-
-    /**
      * mechanism position for dropping pixel
      */
     public void dropPosition(){
         driveStop();
-        if(mechanismState == MechanismState.DROP_POSITION) return;
-        mechanismState = MechanismState.DROP_POSITION;
-        grabberArm.setWristPosition(0.25);
+        if(robotState == RobotState.DropPosition) return;
 
-        grabberArm.closeClaw();
-
-        grabberArm.setArmPosition(1000);
+        setRobotState(RobotState.DropPosition);
 
         linearSlides.topPosition();
+        grabberArm.setWristPosition(0.25);
+        grabberArm.closeClaw();
+        grabberArm.setArmPosition(1000);
     }
 
     /**
      * Raise arms and put them in position for climb
      */
     public void raiseHooks(){
-        driveStop();
-        linearSlides.climbPosition() ;
+        if(getRobotState() == RobotState.ClimbPosition) return;
+
+        robotState = RobotState.ClimbPosition;
+        linearSlides.climbPosition();
     }
 
     /**
      * lower climb so that robot climbs up
      */
     public void climb(){
-        driveStop();
-        linearSlides.climb(1);
+        if(getRobotState() == RobotState.ClimbPosition) {
+            linearSlides.climb(1);
+        }
     }
 
     /**
@@ -311,7 +303,6 @@ public class CenterStageRobot {
      * launch plane
      */
     public void launchPlane(){
-        driveStop();
         planeLauncher.setPosition(1);
     }
 
@@ -319,7 +310,6 @@ public class CenterStageRobot {
      * Reset plane launcher
      */
     public void resetLauncher(){
-        driveStop();
         planeLauncher.setPosition(0);
     }
 
@@ -337,5 +327,13 @@ public class CenterStageRobot {
     public void closeClaw(){
         driveStop();
         grabberArm.closeClaw();
+    }
+
+    public void setRobotState(RobotState state){
+        this.robotState = state;
+    }
+
+    public RobotState getRobotState(){
+        return this.robotState;
     }
 }
