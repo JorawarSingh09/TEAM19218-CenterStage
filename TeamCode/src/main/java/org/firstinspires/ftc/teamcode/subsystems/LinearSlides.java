@@ -32,16 +32,15 @@ public class LinearSlides {
     }
 
     /**
-    Change Position
-     INPUT: pos - change we want from current position
-     Move the linear slide up or down from current position
+     * Change Position
+     * INPUT: pos - change we want from current position
+     * Move the linear slide up or down from current position
      */
     public void changePosition(int pos){
 
         // do nothing if linear slides are already at the bottom or top
-        int newPos =
-                Math.max(getPosition()[0], getPosition()[1]) + pos;
-        if((pos > 0 &&  newPos > 1550) || (pos < 0 && newPos < 0) ) return;
+        int newPos = Math.max(getPosition()[0], getPosition()[1]) + pos;
+        if((pos > 0 && newPos > 1550) || (pos < 0 && newPos < 0)) return;
 
         double power = 0.6;
         leftLinearSlide.setTargetPosition(leftLinearSlide.getCurrentPosition() + pos);
@@ -52,10 +51,6 @@ public class LinearSlides {
 
         leftLinearSlide.setPower(power);
         rightLinearSlide.setPower(power);
-
-        while (leftLinearSlide.isBusy() && rightLinearSlide.isBusy()) {
-            // do some stuff here i guess
-        }
 
         // Stop the motors after reaching the position
         leftLinearSlide.setPower(0.1);
@@ -76,10 +71,6 @@ public class LinearSlides {
         leftLinearSlide.setPower(0.8);
         rightLinearSlide.setPower(0.8);
 
-        while (leftLinearSlide.isBusy() && rightLinearSlide.isBusy()) {
-            // do some stuff here i guess
-        }
-
         // Stop the motors after reaching the position
         leftLinearSlide.setPower(0.1);
         rightLinearSlide.setPower(0.1);
@@ -90,7 +81,6 @@ public class LinearSlides {
     }
 
     public void topPosition(){
-        // power at 80
         setPosition(1200);
     }
 
@@ -99,6 +89,8 @@ public class LinearSlides {
     }
 
     public void climb(double power){
+        leftLinearSlide.setPower(power);
+        rightLinearSlide.setPower(power);
         leftLinearSlide.setTargetPosition(300);
         rightLinearSlide.setTargetPosition(300);
 
@@ -107,14 +99,6 @@ public class LinearSlides {
 
         leftLinearSlide.setPower(power);
         rightLinearSlide.setPower(power);
-
-        while (leftLinearSlide.isBusy() && rightLinearSlide.isBusy()) {
-            // do some stuff here i guess
-        }
-
-        // Stop the motors after reaching the position
-        leftLinearSlide.setPower(0.1);
-        rightLinearSlide.setPower(0.1);
     }
 
     public void reset(){
@@ -127,23 +111,21 @@ public class LinearSlides {
         leftLinearSlide.setPower(0.4);
         rightLinearSlide.setPower(0.4);
 
-        while (leftLinearSlide.isBusy() && rightLinearSlide.isBusy()) {
-            // do some stuff here i guess
-        }
 
         // Stop the motors after reaching the position
         leftLinearSlide.setPower(0.1);
         rightLinearSlide.setPower(0.1);
     }
+
     public void manualDrive(boolean up){
-        double power =  0.1;
-        if(!up) power = - 0.1;
+        double power = 0.1;
+        if(!up) power = -0.1;
         leftLinearSlide.setPower(power);
         rightLinearSlide.setPower((power));
     }
-    public int[] getPosition() {
-        int[] pos = {leftLinearSlide.getCurrentPosition(),
-                    rightLinearSlide.getCurrentPosition()};
+
+    public int[] getPosition(){
+        int[] pos = {leftLinearSlide.getCurrentPosition(), rightLinearSlide.getCurrentPosition()};
         return pos;
     }
 }
