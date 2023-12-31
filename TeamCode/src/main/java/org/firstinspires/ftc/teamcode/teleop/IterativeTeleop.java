@@ -27,6 +27,8 @@ public class IterativeTeleop extends OpMode {
 	public void init(){
 		myRobot = new CenterStageRobot(hardwareMap, telemetry);
 		dashboard = FtcDashboard.getInstance();
+		driver = gamepad1;
+		operator = gamepad2;
 
 		myRobot.startPosition();
 
@@ -42,32 +44,23 @@ public class IterativeTeleop extends OpMode {
 	 */
 	@Override
 	public void loop(){
-		switch(myRobot.getRobotState()){
-			case ClimbPosition:
-				myRobot.raiseHooks();
-			case DropPosition:
-				myRobot.dropPosition();
-			case PickupPosition:
-				myRobot.pickupPosition();
-			case DrivePosition:
-				myRobot.drivePosition();
-			default:
-				break;
 
-		}
+		telemetry.addData("State: ", myRobot.getRobotState());
+		telemetry.update();
 
+		myRobot.drive(driver.left_stick_y, driver.left_stick_x, driver.right_stick_x);
 		// raise claws for climb
 		if(driver.dpad_up){
 			myRobot.setRobotState(RobotState.ClimbPosition);
 		}
 
 		// Pickup Position
-		if(operator.a){
+		if(driver.a){
 			myRobot.setRobotState(RobotState.PickupPosition);
 		}
 
 		// Position where we drop the pixel
-		if(operator.b){
+		if(driver.b){
 			myRobot.setRobotState(RobotState.DropPosition);
 		}
 
@@ -82,13 +75,30 @@ public class IterativeTeleop extends OpMode {
 		}
 
 		// open claw
-		if(operator.left_trigger > 0){
+		if(driver.left_trigger > 0){
 			myRobot.openClaw();
 		}
 
 		// close claw
-		if(operator.right_trigger > 0){
+		if(driver.right_trigger > 0){
 			myRobot.closeClaw();
+		}
+
+		switch(myRobot.getRobotState()){
+			case ClimbPosition:
+				myRobot.raiseHooks();
+				break;
+			case DropPosition:
+				myRobot.dropPosition();
+				break;
+			case PickupPosition:
+				myRobot.pickupPosition();
+				break;
+			case DrivePosition:
+				myRobot.drivePosition();
+				break;
+			default:
+				break;
 		}
 	}
 }
